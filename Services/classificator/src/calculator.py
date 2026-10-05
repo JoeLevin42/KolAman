@@ -1,4 +1,5 @@
 import json
+import geopandas as gpd
 from shapely.geometry import Point, Polygon
 
 def get_region_with_geopandas(file_path: str, lon: float, lat: float):

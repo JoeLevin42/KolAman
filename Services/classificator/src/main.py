@@ -2,11 +2,12 @@ from confluent_kafka import Consumer
 import json
 from reddis import handle_redis
 from calculator import enrich_dict
+from rabbit_service import send_to_rabbit_queue
 
 
 consumer_config = {
     'bootstrap.servers': "localhost:9092",
-     'group.id': 'group-4gfdfedeeedsffddf4',
+     'group.id': 'group-4gfdfedeefdefedsffddf4',
      'auto.offset.reset': 'earliest'}
 
 consumer = Consumer(consumer_config)
@@ -23,8 +24,9 @@ while True :
     redis_result = handle_redis(res_dict)
     if not redis_result:
         new_dict = enrich_dict(res_dict)
-
+        print(new_dict)
         #now here need to send the msg to rabbit
+        send_to_rabbit_queue(new_dict)
 
 
     

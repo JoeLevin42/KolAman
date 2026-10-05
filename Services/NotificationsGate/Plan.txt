@@ -1,0 +1,6 @@
+This program:
+
+Level 1: FileWatcher :
+1 . figure out how to do the file watcher
+2.  Make shure this is ready by the file ready
+3. send this notification to Kafak topic

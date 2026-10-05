@@ -3,11 +3,11 @@ import json
 from reddis import handle_redis
 from calculator import enrich_dict
 from rabbit_service import send_to_rabbit_queue
-
+from log_service import log
 
 consumer_config = {
     'bootstrap.servers': "localhost:9092",
-     'group.id': 'group-4gfdfedeefdefedsffddf4',
+     'group.id': 'group-4defefe8',
      'auto.offset.reset': 'earliest'}
 
 consumer = Consumer(consumer_config)
@@ -17,8 +17,8 @@ while True :
 
     if (response is None):
         continue
-
     res_dict = json.loads(response.value().decode('utf-8')) 
+    log("INFO" , "dict received from kafka")    
 
     #now check if exists in reddis
     redis_result = handle_redis(res_dict)
@@ -27,6 +27,7 @@ while True :
         print(new_dict)
         #now here need to send the msg to rabbit
         send_to_rabbit_queue(new_dict)
+        log("INFO" , "send the dict to rabbit")
 
 
     

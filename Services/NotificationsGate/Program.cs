@@ -3,6 +3,8 @@
 
 
 using Confluent.Kafka;
+using Elastic.Clients.Elasticsearch;
+using Elastic.Transport;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NotificationsGate.Configuration;
@@ -64,6 +66,9 @@ Console.ReadLine();
 
 static void OnCreated(object sender, FileSystemEventArgs e )
 {
+    var settings = new ElasticsearchClientSettings(new Uri("https://localhost:9200"));
+    var eclient = new ElasticsearchClient(settings);
+    var response = eclient.Indices.CreateAsync("logs");
     string value = e.FullPath;
     string newPath = Path.ChangeExtension(value, ".json");
     IProducer<Null, string> producer;

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text.Json;
 
 namespace MyNamespace
 {
@@ -31,7 +32,7 @@ namespace MyNamespace
         }
 
 
-        private static void OnCreated(object sender, FileSystemEventArgs e)
+         void OnCreated(object sender, FileSystemEventArgs e)
         {
             string value = $"Created: {e.FullPath}";
             string newPath = Path.ChangeExtension(value, ".json");
@@ -53,4 +54,20 @@ namespace MyNamespace
 
 
     }
+}//load  public class JsonLoader
+{
+    public List<JsonElement> ReadJson(string path)
+{
+    var json = File.ReadAllText(path);
+
+    return JsonSerializer.Deserialize<List<JsonElement>>(json) ?? [];
+}
+}
+
+//
+foreach (var item in items)
+{
+    var message = item.GetRawText();
+
+    // send message to Kafka or anywhere else 
 }

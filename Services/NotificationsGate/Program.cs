@@ -62,7 +62,6 @@ watcher.EnableRaisingEvents = true;
 Console.WriteLine("Press enter to exit.");
 Console.ReadLine();
 
-
 static void OnCreated(object sender, FileSystemEventArgs e )
 {
     string value = e.FullPath;
@@ -78,12 +77,13 @@ static void OnCreated(object sender, FileSystemEventArgs e )
     {
         var file = File.ReadAllText(newPath);
         var fileObj = JsonSerializer.Deserialize<Alert>(file);
+        var json = JsonSerializer.Serialize(fileObj);
 
         if (fileObj != null)
         {
             producer.ProduceAsync("alerts", new Message<Null, string>
             {
-                Value = file
+                Value = json
             });
         }
 

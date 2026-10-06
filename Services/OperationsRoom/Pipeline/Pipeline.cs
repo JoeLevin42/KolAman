@@ -1,3 +1,4 @@
+using OperationsRoom.Models;
 using OperationsRoom.Services;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +9,12 @@ public class Pipeline
 {
     private readonly ProcessorService _processService;
 
-    public Pipeline(ProcessorService processService)
+    private readonly ElasticService _elastic;
+    public Pipeline(ProcessorService processService,
+         ElasticService elastic)
     {
         _processService = processService;
+        _elastic = elastic;
     }
 
 
@@ -30,14 +34,15 @@ public class Pipeline
 
             // common values across all three lists
             //if service end with common alerts this is Indication
-            var resIndication = CenterCommandTitles
+            var resIndications = CenterCommandTitles
                 .Intersect(NorthCommandTitles)
                 .Intersect(OverseasCommandTitles)
                 .Intersect(SouthCommandTitles);
 
 
-
-            Console.WriteLine(resIndication.Count());
+            await _elastic.SendToIndicationAsync(resIndications.Count());
+           
+            Console.WriteLine(resIndications.Count());
             Console.WriteLine("resIndications:");
             await Task.Delay(TimeSpan.FromSeconds(30)); //second cycle time
         }

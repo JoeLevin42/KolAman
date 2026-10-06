@@ -1,7 +1,7 @@
 
-using CommandsHeadquarters.Models;
 using Elastic.Clients.Elasticsearch;
 using OperationsRoom.Models;
+using OperationsRoom.Services;
 using System.Text.Json.Serialization;
 
 
@@ -11,7 +11,6 @@ namespace CommandsHeadquarters.Services;
 public class LoggerService
 {
     private readonly ElasticService _elastic;
-    const string IndexName = "logs";
     public LoggerService(ElasticService elastic)
     {
         _elastic = elastic;

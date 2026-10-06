@@ -1,3 +1,4 @@
+using CommandsHeadquarters.Services;
 using MongoDB.Driver;
 using OperationsRoom.Configuraion;
 using OperationsRoom.Models;
@@ -10,13 +11,15 @@ public class ProcessorService
     private readonly MongoConfiguration _mongoConfig;
 
     private readonly IMongoDatabase _database;
-
-    public ProcessorService(MongoConfiguration mongoConfig)
+    private readonly LoggerService _logger;
+    public ProcessorService(MongoConfiguration mongoConfig,
+        LoggerService logger)
     {
         _mongoConfig = mongoConfig;
         var client = new MongoClient(_mongoConfig.ConnectionString);
 
         _database = client.GetDatabase(_mongoConfig.DatabaseName);
+        _logger = logger;
     }
 
     public async Task<IList<string>> ProccessCollection(string collectionName)
@@ -52,6 +55,7 @@ public class ProcessorService
                 await Task.Delay(TimeSpan.FromSeconds(delayTime));
                 item.Status = "DONE";
                 await collection.ReplaceOneAsync(x => x.Id == item.Id, item);
+                await _logger.LogAsync("INFO", $"Processed the Alert took {delayTime} seconds");
                 Console.WriteLine($"Finisehd work on item {item.Id}");
             }
             catch (Exception ex)

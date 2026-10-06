@@ -8,7 +8,7 @@ from log_service import log_to_elastic
 def main():
     consumer_config = {
         'bootstrap.servers': "localhost:9092",
-        'group.id': 'group-4defeffeddfeffdffrfrfedfeffdrefe8',
+        'group.id': 'group-4d666',
         'auto.offset.reset': 'earliest'}
 
     consumer = Consumer(consumer_config)

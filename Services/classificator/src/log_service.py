@@ -1,15 +1,18 @@
-from elasticsearch import AsyncElasticsearch
-import datetime
+from datetime import datetime, timezone
+from elasticsearch import Elasticsearch
 
-    
-async def log(level , message):
-    
-    client = AsyncElasticsearch(
-        hosts=["https://localhost:9200"])
-    doc = {"timestamp" :datetime.datetime.now(), "level" : level ,"message" :message}
-   
-    await client.index(index="logs", document=doc)
-    
-    
 
-    
+client = Elasticsearch("http://localhost:9200")
+
+
+def log_to_elastic(level: str, message: str):
+    log = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "level": level,
+        "message": message
+    }
+
+    client.index(
+        index="logs",
+        document=log
+    )

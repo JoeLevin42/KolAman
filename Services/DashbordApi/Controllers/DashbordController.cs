@@ -41,4 +41,14 @@ public class DashbordController : ControllerBase
         }
         return Ok(resultObj);
     }
+
+    //optional
+
+    [HttpGet("sources_count")]  
+    public async Task<ActionResult<object>> GetSegmentationBySourceeAsync()
+    {
+        var resultObj = _mongoService.SegmentationBySourceAsync();
+
+        return Ok(resultObj);
+    }
 }

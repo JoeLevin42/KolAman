@@ -58,6 +58,7 @@ public class ElasticService
             CommonAlerts = IndicationCount
         };
 
+        Console.WriteLine($"Inidcation Count {IndicationCount}");
         var response = await _client.IndexAsync(indicationDoc, x => x.Index(IndexNameIndications));
 
         if (!response.IsValidResponse)

@@ -111,10 +111,49 @@ public class MongoService
         return priorityByCentersObj;
 
     }
+    public async Task<object?> FindTopAlertCollectionAsync()
+    {
+        //get all collection names in your database
+   
+        var collectionNames = new List<string> { "CenterCommand" , 
+            "NorthCommand" , "OverseasCommand" , "SouthCommand" };
+
+        //
+        var collectionStats = collectionNames
+            .Select(name=>
+            {
+                var collection = _database.GetCollection<Alert>(name);
+
+                //total documents in this collection
+                long totalDocs = collection.CountDocuments(new BsonDocument());
+
+                //count only high or critical priorities
+                var filter = Builders<Alert>.Filter.Or(
+                    Builders<Alert>.Filter.Eq(a => a.Priority, "HIGH"),
+                    Builders<Alert>.Filter.Eq(a => a.Priority, "CRITICAL")
+                );
+                long urgentDocs = collection.CountDocuments(filter);
+
+                return new
+                {
+                    CollectionName = name,
+                    TotalCount = totalDocs,
+                    UrgentCount = urgentDocs
+                };
+            })
+            .ToList();
+
+
+        // Sorting primarily by urgent documents, then by total overall documents
+        var topCollection = collectionStats
+            .OrderByDescending(c => c.UrgentCount)
+            .ThenByDescending(c => c.TotalCount)
+            .FirstOrDefault();
+
+        return topCollection;
+    }
 
 
 
 
-
-
-}
+    }

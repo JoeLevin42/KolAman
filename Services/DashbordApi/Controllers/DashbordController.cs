@@ -31,4 +31,14 @@ public class DashbordController : ControllerBase
         var resultObj = await _mongoService.SegmentationByStatusAsync();
         return Ok(resultObj);
     }
+    [HttpGet("hotest_region")]
+    public async Task<ActionResult<object>> FindTopAlertCollectionAsync()
+    {
+        var resultObj = await _mongoService.FindTopAlertCollectionAsync();
+        if (resultObj == null)
+        {
+            return BadRequest();
+        }
+        return Ok(resultObj);
+    }
 }

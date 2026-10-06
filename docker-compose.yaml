@@ -47,3 +47,9 @@ services:
     ports:
       - "9200:9200"
 
+  mongo:
+    image: mongo:8
+    container_name: mongo
+    ports:
+      - "27017:27017"
+

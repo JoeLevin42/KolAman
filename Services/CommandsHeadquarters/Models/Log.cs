@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace CenterCommand.Models;
+namespace CommandsHeadquarters.Models;
 
 
 public class Log
@@ -12,5 +12,5 @@ public class Log
     public string Message { get; set; }
 
     [JsonPropertyName("timestamp")]
-    public DateTime timestamp { get; set; }
+    public DateTime Timestamp { get; set; }
 }

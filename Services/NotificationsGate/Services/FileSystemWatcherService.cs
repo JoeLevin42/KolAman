@@ -9,7 +9,7 @@ public class FileWatcherService  //IDisposable
 {
     private readonly KafkaService _kafkaService;
     private readonly LoggerService _loggerService;
-    private readonly FileSystemWatcher _watcher;
+    private  FileSystemWatcher _watcher;
 
     public FileWatcherService(
         KafkaService kafkaService,
@@ -19,13 +19,15 @@ public class FileWatcherService  //IDisposable
         _loggerService = loggerService;
 
         _watcher = new FileSystemWatcher("C:\\Users\\JL202\\Desktop\\KolAman\\alert-simulator\\alerts") // need to be changed
+           
         {
             Filter = "*.ready",
             IncludeSubdirectories = true,
             NotifyFilter = NotifyFilters.FileName,
             EnableRaisingEvents = true
+            
         };
-
+        _watcher.InternalBufferSize = 65536; // NEED TO CHECK THIS
         _watcher.Created += OnCreated;
     }
 

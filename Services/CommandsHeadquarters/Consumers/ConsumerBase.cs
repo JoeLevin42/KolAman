@@ -51,7 +51,7 @@ public abstract class BaseConsumer
             autoAck: false,
             consumer: consumer);
 
-        Console.WriteLine($"{queueName} consumer started.");
+        Console.WriteLine($"{queueName} consumer started");
     }
 
     protected abstract Task HandleMessageAsync(string message);

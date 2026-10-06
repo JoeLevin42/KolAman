@@ -5,13 +5,12 @@ using System.Text.Json;
 
 namespace CommandsHeadquarters.Services;
 
-public class NorthService
+public class SouthService
 {
     private readonly MongoService _mongoService;
     private readonly LoggerService _logger;
 
-
-    public NorthService(MongoService mongoService,
+    public SouthService(MongoService mongoService,
         LoggerService logger)
     {
         _mongoService = mongoService;
@@ -30,8 +29,7 @@ public class NorthService
         {
             Console.WriteLine("Error the obj not valid");
         }
-        await _mongoService.InsertAsync("NorthCommand", bsonDocument);
-        await _logger.LogAsync("INFO", $"sent to NorthCommand{message}");
-
+        await _mongoService.InsertAsync("SouthCommand", bsonDocument);
+        await _logger.LogAsync("INFO", $"sent to SouthCommand{message}");
     }
 }

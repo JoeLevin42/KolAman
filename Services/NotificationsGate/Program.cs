@@ -11,6 +11,7 @@ using NotificationsGate.Configuration;
 using NotificationsGate.Models;
 using NotificationsGate.Services;
 using System.Text.Json;
+using YourProject.Services;
 var configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", false, true).Build();
 
@@ -33,72 +34,30 @@ services.AddSingleton(elasticConfig);
 services.AddSingleton<ElasticService>();
 services.AddSingleton<LoggerService>();
 services.AddSingleton<KafkaService>();
-services.AddSingleton<FileLoaderService>();
-
+services.AddSingleton<FileWatcherService>();
 var serviceProvider = services.BuildServiceProvider();
 
 
-var kafkaService = serviceProvider.GetRequiredService<KafkaService>();
-var fileLoader = serviceProvider.GetRequiredService<FileLoaderService>();
 
 
-using var watcher = new FileSystemWatcher("C:\\Users\\JL202\\Desktop\\KolAman\\alert-simulator\\alerts");
+// Create the logs index before starting the pipeline
+var elasticService = serviceProvider.GetRequiredService<ElasticService>();
 
-watcher.NotifyFilter = NotifyFilters.Attributes
-                     | NotifyFilters.CreationTime
-                     | NotifyFilters.DirectoryName
-                     | NotifyFilters.FileName
-                     | NotifyFilters.LastAccess
-                     | NotifyFilters.LastWrite
-                     | NotifyFilters.Security
-                     | NotifyFilters.Size;
+await elasticService.CreateIndexAsync();
 
+// Start the FileSystemWatcher
+var watcher = serviceProvider.GetRequiredService<FileWatcherService>();
 
-watcher.Created += OnCreated;
+Console.WriteLine("File watcher is running.");
+Console.WriteLine("Press Enter to stop.");
 
-watcher.Filter = "*.ready";
-watcher.IncludeSubdirectories = true;
-watcher.EnableRaisingEvents = true;
-
-
-Console.WriteLine("Press enter to exit.");
 Console.ReadLine();
 
-static void OnCreated(object sender, FileSystemEventArgs e )
-{
-    var settings = new ElasticsearchClientSettings(new Uri("https://localhost:9200"));
-    var eclient = new ElasticsearchClient(settings);
-    var response = eclient.Indices.CreateAsync("logs");
-    string value = e.FullPath;
-    string newPath = Path.ChangeExtension(value, ".json");
-    IProducer<Null, string> producer;
-    var kafkaConfig = new ProducerConfig
-    {
-        BootstrapServers = "localhost:9092"
-    };
-    producer = new ProducerBuilder<Null, string>(kafkaConfig).Build();
 
-    try
-    {
-        var file = File.ReadAllText(newPath);
-        var fileObj = JsonSerializer.Deserialize<Alert>(file);
-        var json = JsonSerializer.Serialize(fileObj);
 
-        if (fileObj != null)
-        {
-            producer.ProduceAsync("alerts", new Message<Null, string>
-            {
-                Value = json
-            });
-        }
 
-    }
 
-    catch (Exception ex)
-    {
-        Console.WriteLine(ex.Message);
-    }
-}
+
 
 
 

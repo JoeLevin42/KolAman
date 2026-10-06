@@ -1,4 +1,7 @@
+using Elastic.Clients.Elasticsearch;
 using NotificationsGate.Models;
+using System.Text.Json.Serialization;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace NotificationsGate.Services;
 
@@ -6,14 +9,30 @@ namespace NotificationsGate.Services;
 public class LoggerService
 {
     private readonly ElasticService _elastic;
-
+    const string IndexName = "logs";
     public LoggerService(ElasticService elastic)
     {
         _elastic = elastic;
     }
+    
 
-    public async Task Log(string level , Log log)
+
+
+  
+   
+    public async Task LogAsync(string level, string message)
     {
+        var log = new Log
+        {
+            Level = level,
+            Message = message,
+            Timestamp = DateTime.UtcNow
+        };
+
+        await _elastic.AddToIndexAsync(log);
 
     }
 }
+
+
+

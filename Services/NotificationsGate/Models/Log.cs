@@ -12,5 +12,5 @@ public class Log
     public string Message { get; set; }
 
     [JsonPropertyName("timestamp")]
-    public DateTime timestamp { get; set; }
+    public DateTime Timestamp { get; set; }
 }

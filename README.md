@@ -112,5 +112,5 @@ every 30 second the service is checking all the alerts and proccessing them givi
 for every level of priority 
 sending the logs to elastic
 and sending indication numebr that this is the count of the commons alerts in more than two regions 
-that mybe telling us something happening.
+that mybe telling us something happening
 

@@ -16,16 +16,16 @@ public class MongoService
         var client = new MongoClient(configuration.ConnectionString);
 
         _database = client.GetDatabase(configuration.DatabaseName);
-        
+
     }
 
     public async Task<CommandsAlertCount> GetAllCommandCount()
     {
         var cnterCollectionCount = _database.GetCollection<BsonDocument>("CenterCommand")
-                                .CountDocuments(_=> true);
+                                .CountDocuments(_ => true);
         var northCollectionCount = _database.GetCollection<BsonDocument>("NorthCommand")
                                 .CountDocuments(_ => true);
-                                
+
         var southCollectionCount = _database.GetCollection<BsonDocument>("SouthCommand")
                                 .CountDocuments(_ => true);
         var overseasCollectionCount = _database.GetCollection<BsonDocument>("OverseasCommand")
@@ -46,20 +46,32 @@ public class MongoService
     {
         var centerByPriority = _database.GetCollection<Alert>("CenterCommand").AsQueryable()
                              .GroupBy(a => a.Priority)
-                            .Select(g => new { Priority = g.Key, Count = g.Count() 
+                            .Select(g => new
+                            {
+                                Priority = g.Key,
+                                Count = g.Count()
                             }).ToList();
 
         var northByPriority = _database.GetCollection<Alert>("NorthCommand").AsQueryable()
                              .GroupBy(a => a.Priority)
-                            .Select(g => new { Priority = g.Key, Count = g.Count() 
+                            .Select(g => new
+                            {
+                                Priority = g.Key,
+                                Count = g.Count()
                             }).ToList();
         var southByPriority = _database.GetCollection<Alert>("SouthCommand").AsQueryable()
                              .GroupBy(a => a.Priority)
-                            .Select(g => new { Priority = g.Key, Count = g.Count()
+                            .Select(g => new
+                            {
+                                Priority = g.Key,
+                                Count = g.Count()
                             }).ToList();
         var overseasByPriority = _database.GetCollection<Alert>("OverseasCommand").AsQueryable()
                              .GroupBy(a => a.Priority)
-                            .Select(g => new { Priority = g.Key, Count = g.Count() 
+                            .Select(g => new
+                            {
+                                Priority = g.Key,
+                                Count = g.Count()
                             }).ToList();
 
         var priorityByCentersObj = new
@@ -77,26 +89,30 @@ public class MongoService
     {
         var centerByPriority = _database.GetCollection<Alert>("CenterCommand").AsQueryable()
                              .GroupBy(a => a.Status)
-                            .Select(g => new {
+                            .Select(g => new
+                            {
                                 Priority = g.Key,
                                 Count = g.Count()
                             }).ToList();
 
         var northByPriority = _database.GetCollection<Alert>("NorthCommand").AsQueryable()
                              .GroupBy(a => a.Status)
-                            .Select(g => new {
+                            .Select(g => new
+                            {
                                 Priority = g.Key,
                                 Count = g.Count()
                             }).ToList();
         var southByPriority = _database.GetCollection<Alert>("SouthCommand").AsQueryable()
                              .GroupBy(a => a.Status)
-                            .Select(g => new {
+                            .Select(g => new
+                            {
                                 Priority = g.Key,
                                 Count = g.Count()
                             }).ToList();
         var overseasByPriority = _database.GetCollection<Alert>("OverseasCommand").AsQueryable()
                              .GroupBy(a => a.Status)
-                            .Select(g => new {
+                            .Select(g => new
+                            {
                                 Priority = g.Key,
                                 Count = g.Count()
                             }).ToList();
@@ -113,21 +129,21 @@ public class MongoService
     }
     public async Task<object?> FindTopAlertCollectionAsync()
     {
-        //get all collection names in your database
-   
-        var collectionNames = new List<string> { "CenterCommand" , 
+        //get all collection names in db
+
+        var collectionNames = new List<string> { "CenterCommand" ,
             "NorthCommand" , "OverseasCommand" , "SouthCommand" };
 
-        //
+
         var collectionStats = collectionNames
-            .Select(name=>
+            .Select(name =>
             {
                 var collection = _database.GetCollection<Alert>(name);
 
                 //total documents in this collection
                 long totalDocs = collection.CountDocuments(new BsonDocument());
 
-                //count only high or critical priorities
+                //count only hight or critical priorities
                 var filter = Builders<Alert>.Filter.Or(
                     Builders<Alert>.Filter.Eq(a => a.Priority, "HIGH"),
                     Builders<Alert>.Filter.Eq(a => a.Priority, "CRITICAL")
@@ -144,7 +160,7 @@ public class MongoService
             .ToList();
 
 
-        // Sorting primarily by urgent documents, then by total overall documents
+        //sorting first by urgent documents, then by total  documents
         var topCollection = collectionStats
             .OrderByDescending(c => c.UrgentCount)
             .ThenByDescending(c => c.TotalCount)
@@ -153,7 +169,50 @@ public class MongoService
         return topCollection;
     }
 
+    public async Task<object> SegmentationBySourceAsync()
+    {
+        var centerBySource = _database.GetCollection<Alert>("CenterCommand").AsQueryable()
+                             .GroupBy(a => a.Source)
+                            .Select(g => new
+                            {
+                                Source = g.Key,
+                                Count = g.Count()
+                            }).ToList();
+
+        var northBySource = _database.GetCollection<Alert>("NorthCommand").AsQueryable()
+                             .GroupBy(a => a.Source)
+                            .Select(g => new
+                            {
+                                Source = g.Key,
+                                Count = g.Count()
+                            }).ToList();
 
 
+        var southBySource = _database.GetCollection<Alert>("SouthCommand").AsQueryable()
+                             .GroupBy(a => a.Source)
+                            .Select(g => new
+                            {
+                                Source = g.Key,
+                                Count = g.Count()
+                            }).ToList();
+
+        var overseasBySourece = _database.GetCollection<Alert>("OverseasCommand").AsQueryable()
+                             .GroupBy(a => a.Source)
+                            .Select(g => new
+                            {
+                                Source = g.Key,
+                                Count = g.Count()
+                            }).ToList();
+
+
+        var SourceCountByCenters= new
+        {
+            CenterCommand = centerBySource,
+            NorthCommand = northBySource,
+            SouthByPriority = southBySource,
+            OverseasByPriority = overseasBySourece
+        };
+        return SourceCountByCenters;
 
     }
+}

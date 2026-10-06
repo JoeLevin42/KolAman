@@ -39,12 +39,12 @@ public class ProcessorService
                 item.Status = "INPROGRESS";
                 await collection.ReplaceOneAsync(x => x.Id == item.Id, item); // changed the status before process
                 // time by prior
-                var delayTime = 3;
+                var delayTime = 300;
 
                 Console.WriteLine($"Start working on item {item.Id}");
-                if (item.Priority == "CRITICAL") { delayTime = 4; }
-                if (item.Priority == "HIGH") { delayTime = 3; }
-                if (item.Priority == "MEDIUM ") { delayTime = 2; }
+                if (item.Priority == "CRITICAL") { delayTime = 400; }
+                if (item.Priority == "HIGH") { delayTime = 300; }
+                if (item.Priority == "MEDIUM ") { delayTime = 200; }
                 if (item.Priority == "LOW ")
                 {
                     item.Status = "CANCEl";
@@ -52,7 +52,7 @@ public class ProcessorService
                     continue;
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(delayTime));
+                await Task.Delay(delayTime);
                 item.Status = "DONE";
                 await collection.ReplaceOneAsync(x => x.Id == item.Id, item);
                 await _logger.LogAsync("INFO", $"Processed the Alert took {delayTime} seconds");

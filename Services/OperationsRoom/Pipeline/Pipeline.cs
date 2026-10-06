@@ -44,7 +44,7 @@ public class Pipeline
            
             Console.WriteLine(resIndications.Count());
             Console.WriteLine("resIndications:");
-            await Task.Delay(TimeSpan.FromSeconds(30)); //second cycle time
+            await Task.Delay(TimeSpan.FromSeconds(5)); //second cycle time
         }
     } 
 

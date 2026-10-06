@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Headquarters.Models;
+namespace CenterCommand.Models;
 
 
 public class Alert
@@ -34,9 +34,6 @@ public class Alert
 
     [JsonPropertyName("status")]
     public string Status { get; set; }
-
-    [JsonPropertyName("command_name")]
-    public string CommandName { get; set; }
 
 
 }

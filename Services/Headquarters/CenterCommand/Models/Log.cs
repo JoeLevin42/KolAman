@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Headquarters.Models;
+namespace CenterCommand.Models;
 
 
 public class Log

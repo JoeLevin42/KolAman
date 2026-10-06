@@ -11,6 +11,14 @@ this is system is used for getting stream of alert and direct them into the righ
 cd KolAman
 ```
 
+
+## Run the Compose with all services
+
+```
+docker compose up -d
+
+```
+
 ### first run the simulator
 
 ```

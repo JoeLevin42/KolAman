@@ -1,4 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
+// See https://aka.ms/new-console-template for more information
 Console.WriteLine("Hello, World!");
 public async Task<List<Book>> GetAsync(string authorName) => 
     await _booksCollection.Find(book => book.Author == authorName).ToListAsync();
@@ -36,26 +36,26 @@ var client = new MongoClient("mongodb://localhost:27017");
 var db = client.GetDatabase("MyDatabase");
 var collection = db.GetCollection<MyDocument>("MyCollection");
 
-// רשימה חדשה וריקה בכל סבב
+// new empty list every cycle
 List<string> titles = new List<string>();
 
-// לקחת רק חדשים
-var items = await collection.Find(x => x.Status == "חדש").ToListAsync();
+// take only the new
+var items = await collection.Find(x => x.Status == "NEW").ToListAsync();
 
 foreach (var item in items)
 {
-    // לשמור את ה-Title של האובייקט ברשימה
+    // save the title object in list
     titles.Add(item.Title);
 
-    // זמן לפי עדיפות
+    // time by prior
     await Task.Delay(
-        item.Priority == "נמוכה" ? 1000 :
-        item.Priority == "גבוהה" ? 3000 :
+        item.Priority == "low" ? 1000 :
+        item.Priority == "hight" ? 3000 :
         2000
     );
 
-    // שינוי סטטוס
-    item.Status = "עובד";
+    // status cahnged
+    item.Status = "DONE";
 
     await collection.ReplaceOneAsync(
         x => x.Id == item.Id,
@@ -63,7 +63,7 @@ foreach (var item in items)
     );
 }
 
-// כאן titles מכילה את כל ה-Titles של הסבב
+// all title of this cycle here
 foreach (var title in titles)
 {
     Console.WriteLine(title);

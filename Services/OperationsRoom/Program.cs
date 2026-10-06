@@ -1,28 +1,31 @@
-// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
-public async Task<List<Book>> GetAsync(string authorName) => 
-    await _booksCollection.Find(book => book.Author == authorName).ToListAsync();
 
-public async Task<List<Book>> GetAsync() =>
-    await booksCollection.Find(book => book.Status == "wait").ToListAsync();
 
-public async Task<List<Book>> GetAsync()
+
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using OperationsRoom.Configuraion;
+using OperationsRoom.Pipeline;
+using OperationsRoom.Services;
+
+var configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", optional: false)
+    .Build();
+
+var services = new ServiceCollection();
+//register all here
+
+var mongoConfig = new MongoConfiguration
 {
-    var filter = Builders<Book>.Filter.Eq(book => book.Status, "wait");
-    return await booksCollection.Find(filter).ToListAsync();
-}
+    ConnectionString = configuration["Mongo:ConnectionString"]!,
+    DatabaseName = configuration["Mongo:DatabaseName"]!
+};
 
-//var commonTitles = new List<string>();
+services.AddSingleton(mongoConfig);
+services.AddSingleton<ProcessorService>();
+services.AddSingleton<Pipeline>();
 
-var lists = new[] { list1, list2, list3, list4 };
+var provider = services.BuildServiceProvider();
 
-foreach (var list in lists)
-{
-    foreach (var alert in list)
-    {
-        int count = lists.Count(x => x.Any(a => a.Title == alert.Title));
+var pipeline = provider.GetRequiredService<Pipeline>();
 
-        if (count > 1 && !commonTitles.Contains(alert.Title))
-            commonTitles.Add(alert.Title);
-    }
-}
+await pipeline.Run();

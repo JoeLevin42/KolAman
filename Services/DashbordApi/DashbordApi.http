@@ -1,0 +1,6 @@
+@DashbordApi_HostAddress = http://localhost:5293
+
+GET {{DashbordApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

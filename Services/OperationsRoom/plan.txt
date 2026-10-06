@@ -76,3 +76,47 @@ public class MyDocument
     public string Priority { get; set; }
     public string Title { get; set; }
 }
+using MongoDB.Driver;
+using MongoDB.Bson;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using OperationsRoom.Models;
+
+public async Task FindTopAlertCollectionAsync(IMongoDatabase database)
+{
+    // 1. Get all collection names in your database
+    var collectionsCursor = await database.ListCollectionNamesAsync();
+    var collectionNames = await collectionsCursor.ToListAsync();
+
+    // 2. Query stats for each collection and process using LINQ
+    var collectionStats = collectionNames
+        .Select(name =>
+        {
+            var collection = database.GetCollection<Alert>(name);
+
+            // Total documents in this collection
+            long totalDocs = collection.CountDocuments(new BsonDocument());
+
+            // Count only High or Critical priorities
+            var filter = Builders<Alert>.Filter.Or(
+                Builders<Alert>.Filter.Eq(a => a.Priority, "high"),
+                Builders<Alert>.Filter.Eq(a => a.Priority, "critical")
+            );
+            long urgentDocs = collection.CountDocuments(filter);
+
+            return new
+            {
+                CollectionName = name,
+                TotalCount = totalDocs,
+                UrgentCount = urgentDocs
+            };
+        })
+        .ToList();
+
+    // 3. Use LINQ to find the collection that tops both metrics
+    // Sorting primarily by urgent documents, then by total overall documents
+    var topCollection = collectionStats
+        .OrderByDescending(c => c.UrgentCount)
+        .ThenByDescending(c => c.TotalCount)
+        .FirstOrDefault();
